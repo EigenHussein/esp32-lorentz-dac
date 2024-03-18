@@ -98,34 +98,3 @@ extern "C" void app_main(void)
     }
 }
 
-extern "C" void
-app_main2(void)
-{
-    dac_oneshot_handle_t dac1_handler, dac2_handler = {};
-
-    dac_oneshot_config_t dac1{.chan_id = DAC_CHAN_0};
-    dac_oneshot_config_t dac2{.chan_id = DAC_CHAN_1};
-
-    dac_oneshot_new_channel(&dac1, &dac1_handler);
-    dac_oneshot_new_channel(&dac2, &dac2_handler);
-
-    uint8_t *sine_samples = (uint8_t *)calloc(256, 1);
-    uint8_t *cosine_samples = (uint8_t *)calloc(256, 1);
-    for (int i = 0; i < 256; i++)
-    {
-        float t = 2 * 3.1415926 * i / (255.0);
-        sine_samples[i] = 128 + 127 * sin(t);
-        cosine_samples[i] = 128 + 127 * cos(t);
-    }
-
-    unsigned int counter = 0;
-    while (1)
-    {
-
-        dac_oneshot_output_voltage(dac1_handler, sine_samples[counter]);
-        dac_oneshot_output_voltage(dac2_handler, cosine_samples[counter]);
-        counter = (counter + 1) & 0xff;
-        esp_rom_delay_us(100);
-        // vTaskDelay(pdMS_TO_TICKS(2));
-    }
-}
